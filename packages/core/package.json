@@ -1,0 +1,23 @@
+{
+    "name": "@lowcode/core",
+    "version": "1.0.0",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest"
+    },
+    "dependencies": {
+        "@lowcode/model": "workspace:*",
+        "@lowcode/plugin": "workspace:*",
+        "@lowcode/material": "workspace:*",
+        "@lowcode/renderer": "workspace:*",
+        "@lowcode/utils-logger": "workspace:*",
+        "immer": "^10.0.0",
+        "mitt": "^3.0.1"
+    },
+    "devDependencies": {
+        "vite-plugin-dts": "^3.0.0"
+    }
+}

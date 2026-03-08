@@ -1,0 +1,17 @@
+{
+    "name": "@lowcode/material",
+    "version": "1.0.0",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest"
+    },
+    "dependencies": {
+        "@lowcode/utils-logger": "workspace:*"
+    },
+    "devDependencies": {
+        "vite-plugin-dts": "^3.0.0"
+    }
+}

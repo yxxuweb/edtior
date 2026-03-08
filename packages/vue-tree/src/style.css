@@ -1,0 +1,153 @@
+/* ── VirtualTree Container ──────────────────────────────── */
+.vtree-container {
+    position: relative;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    color: #1a202c;
+}
+
+.vtree-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.vtree-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.vtree-container::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.vtree-container::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* ── Phantom (total height spacer) ─────────────────────── */
+.vtree-phantom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+}
+
+/* ── Visible area (translated) ─────────────────────────── */
+.vtree-visible-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+/* ── Single Row ────────────────────────────────────────── */
+.vtree-node-row {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    cursor: pointer;
+    padding-right: 12px;
+    transition: background-color 0.15s ease;
+    user-select: none;
+}
+
+.vtree-node-row:hover {
+    background-color: #f7fafc;
+}
+
+.vtree-node-row--selected {
+    background-color: #ebf8ff;
+}
+
+.vtree-node-row--selected:hover {
+    background-color: #bee3f8;
+}
+
+/* ── Expand/Collapse Icon ──────────────────────────────── */
+.vtree-expand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: #718096;
+    transition: transform 0.2s ease;
+}
+
+.vtree-expand-icon--expanded .vtree-chevron {
+    transform: rotate(90deg);
+}
+
+.vtree-expand-icon--leaf {
+    cursor: default;
+}
+
+.vtree-chevron {
+    transition: transform 0.2s ease;
+}
+
+.vtree-leaf-spacer {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+}
+
+/* ── Node Label ────────────────────────────────────────── */
+.vtree-node-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 4px;
+    line-height: 1.5;
+}
+
+/* ── Auto-Load Indicator ───────────────────────────────── */
+.vtree-node-row--load-more {
+    cursor: default;
+}
+
+.vtree-node-row--load-more:hover {
+    background-color: transparent;
+}
+
+.vtree-auto-load-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    color: #a0aec0;
+    font-size: 13px;
+}
+
+.vtree-auto-load-text {
+    color: #a0aec0;
+}
+
+.vtree-auto-load-count {
+    color: #cbd5e0;
+    font-size: 12px;
+}
+
+/* ── Spinner ───────────────────────────────────────────── */
+.vtree-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #e2e8f0;
+    border-top-color: #4299e1;
+    border-radius: 50%;
+    animation: vtree-spin 0.6s linear infinite;
+}
+
+@keyframes vtree-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

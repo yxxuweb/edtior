@@ -1,0 +1,28 @@
+{
+    "name": "@lowcode/vue-tree",
+    "version": "1.0.0",
+    "description": "Vue 3 Tree Component with Virtual Scrolling and Per-Level Pagination",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.mjs",
+            "require": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        },
+        "./style.css": "./dist/style.css"
+    },
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch"
+    },
+    "peerDependencies": {
+        "vue": "^3.3.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.0.0",
+        "vite-plugin-dts": "^3.7.0",
+        "vue": "^3.3.0"
+    }
+}

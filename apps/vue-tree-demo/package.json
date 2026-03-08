@@ -1,0 +1,17 @@
+{
+    "name": "@lowcode/vue-tree-demo",
+    "private": true,
+    "version": "0.0.0",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "dependencies": {
+        "@lowcode/vue-tree": "workspace:*",
+        "vue": "^3.3.0"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.0.0",
+        "vite": "^5.0.0"
+    }
+}

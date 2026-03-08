@@ -1,0 +1,26 @@
+{
+    "name": "@lowcode/renderer-react",
+    "version": "1.0.0",
+    "description": "React React Class for LowCode Engine Renderer",
+    "main": "./dist/index.js",
+    "module": "./dist/index.mjs",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest"
+    },
+    "peerDependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "dependencies": {
+        "@lowcode/model": "workspace:*",
+        "@lowcode/renderer": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.0",
+        "@types/react-dom": "^18.2.0",
+        "@vitejs/plugin-react": "^4.2.0",
+        "vite-plugin-dts": "^3.7.0"
+    }
+}
