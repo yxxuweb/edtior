@@ -23,7 +23,7 @@
                 <input
                     v-model="searchKeyword"
                     type="text"
-                    placeholder="搜索节点..."
+                    placeholder="输入关键字进行后端搜索..."
                     class="demo-search-input"
                     @input="onSearch"
                 />
@@ -36,9 +36,12 @@
                 </button>
             </div>
             <div v-if="searchKeyword" class="demo-search-info">
-                找到 {{ matchedNodes.length }} 个匹配节点
+                <span v-if="isSearching" class="demo-searching">搜索中...</span>
+                <span v-else>
+                    后端返回了包含关键字的节点树
+                </span>
                 <button
-                    v-if="matchedNodes.length > 0"
+                    v-if="!isSearching && matchedNodes.length > 0"
                     class="demo-select-all-btn"
                     @click="selectAllMatched"
                 >
@@ -55,6 +58,19 @@
                     清除选中
                 </button>
             </div>
+            <div class="demo-controls">
+                <label class="demo-control-label">
+                    <input type="checkbox" v-model="folderSelectable" />
+                    允许选中文件夹 (非叶子节点)
+                </label>
+                <label class="demo-control-label">
+                    选择模式:
+                    <select v-model="selectionMode">
+                        <option value="single">单选 (Single)</option>
+                        <option value="multiple">多选 (Multiple)</option>
+                    </select>
+                </label>
+            </div>
         </header>
 
         <main class="demo-content">
@@ -69,7 +85,8 @@
                 :has-more-root="hasMoreRoot"
                 :selected-keys="selectedKeys"
                 :default-expanded-keys="expandedKeys"
-                selection-mode="multiple"
+                :selection-mode="selectionMode"
+                :folder-selectable="folderSelectable"
                 @select="onSelect"
             >
                 <template #default="{ node }">
@@ -97,8 +114,6 @@ const MAX_DEPTH = 5;
 const TOTAL_CHILDREN = 200;
 const LOAD_DELAY = 300;
 
-let nextId = 1;
-
 export default defineComponent({
     name: 'App',
     components: { VirtualTree },
@@ -116,16 +131,23 @@ export default defineComponent({
         const expandedKeys = ref<Set<string | number>>(new Set());
         const searchKeyword = ref('');
         const matchedNodes = ref<TreeNodeData[]>([]);
+        const isSearching = ref(false);
+        const selectionMode = ref<'single' | 'multiple'>('multiple');
+        const folderSelectable = ref(true);
+        let searchTimer: any = null;
 
         loadRootPage();
 
         function loadRootPage() {
+            // Disabled if we are showing search results
+            if (searchKeyword.value.trim()) return;
+
             const remaining = TOTAL_ROOT_COUNT - rootLoadedCount.value;
             const count = Math.min(PAGE_SIZE, remaining);
 
             for (let i = 0; i < count; i++) {
-                const id = nextId++;
                 const index = rootLoadedCount.value + i + 1;
+                const id = `root-${index}`;
                 treeData.push({
                     id,
                     label: `根节点 ${index}`,
@@ -159,8 +181,8 @@ export default defineComponent({
             const children: TreeNodeData[] = [];
 
             for (let i = 0; i < count; i++) {
-                const childId = nextId++;
                 const childIndex = currentLoaded + i + 1;
+                const childId = `${node.id}-child-${childIndex}`;
                 const isLeaf = depth + 1 >= MAX_DEPTH;
                 children.push({
                     id: childId,
@@ -186,79 +208,106 @@ export default defineComponent({
             return slashes + 1;
         }
 
-        function findMatchingNodes(
-            nodes: TreeNodeData[],
-            keyword: string
-        ): TreeNodeData[] {
-            const matches: TreeNodeData[] = [];
-            const lowerKeyword = keyword.toLowerCase();
+        async function mockBackendSearch(keyword: string): Promise<TreeNodeData[]> {
+            // Simulate network delay
+            await new Promise((r) => setTimeout(r, 600));
 
-            function walk(nodeList: TreeNodeData[]) {
-                for (const node of nodeList) {
-                    if (node.label.toLowerCase().includes(lowerKeyword)) {
-                        matches.push(node);
-                    }
-                    if (node.children && node.children.length > 0) {
-                        walk(node.children);
-                    }
+            // Generate a fake tree structure containing the keyword
+            const keywordStr = keyword.toLowerCase();
+            const rootId = `search-root-mock-${keywordStr}`;
+            const childId = `search-child-mock-${keywordStr}`;
+            const grandChildId = `search-match-mock-${keywordStr}`;
+
+            // Create a fake match so tracking still works (in reality the backend would flag these)
+            const matchedNode: TreeNodeData = {
+                id: grandChildId,
+                label: `模拟匹配的节点 - 包含 ${keywordStr}`,
+                isLeaf: true,
+            };
+
+            // Store it so the UI can highlight it via isMatched check
+            matchedNodes.value = [matchedNode];
+
+            const result: TreeNodeData[] = [
+                {
+                    id: rootId,
+                    label: '搜索结果根级 (Mock)',
+                    isLeaf: false,
+                    hasMore: false,
+                    children: [
+                        {
+                            id: childId,
+                            label: '展开查看匹配项',
+                            isLeaf: false,
+                            hasMore: false,
+                            children: [matchedNode]
+                        }
+                    ]
                 }
-            }
+            ];
 
-            walk(nodes);
-            return matches;
+            return result;
         }
 
-        function findParentChain(
-            nodes: TreeNodeData[],
-            targetId: string | number,
-            path: TreeNodeData[] = []
-        ): TreeNodeData[] | null {
-            for (const node of nodes) {
-                if (node.id === targetId) {
-                    return path;
-                }
-                if (node.children && node.children.length > 0) {
-                    const result = findParentChain(node.children, targetId, [
-                        ...path,
-                        node
-                    ]);
-                    if (result) return result;
-                }
-            }
-            return null;
-        }
+        function onSearch() {
+            const keyword = searchKeyword.value.trim();
 
-        async function onSearch() {
-            if (!searchKeyword.value.trim()) {
-                matchedNodes.value = [];
+            if (searchTimer) clearTimeout(searchTimer);
+
+            if (!keyword) {
+                clearSearch();
                 return;
             }
 
-            matchedNodes.value = findMatchingNodes(
-                treeData,
-                searchKeyword.value.trim()
-            );
+            isSearching.value = true;
+            searchTimer = setTimeout(async () => {
+                try {
+                    // Call the fake backend search
+                    const resultTree = await mockBackendSearch(keyword);
 
-            const newExpandedKeys = new Set<string | number>();
-            for (const matchedNode of matchedNodes.value) {
-                const parentChain = findParentChain(treeData, matchedNode.id);
-                if (parentChain) {
-                    for (const parent of parentChain) {
-                        newExpandedKeys.add(parent.id);
+                    // If user changed input while fetching, abort updating
+                    if (searchKeyword.value.trim() !== keyword) return;
+
+                    // 1. Clear existing tree data
+                    treeData.splice(0, treeData.length);
+                    loadedCountMap.clear();
+                    // 2. Insert the backend search result tree
+                    treeData.push(...resultTree);
+                    // 3. Disable root pagination for search results
+                    hasMoreRoot.value = false;
+
+                    // 4. Automatically expand the path to the mocked matched node
+                    const newExpandedKeys = new Set<string | number>();
+                    // In a real app, backend might return a list of path IDs to expand
+                    // We know our mock structure: result[0].id and result[0].children[0].id
+                    newExpandedKeys.add(resultTree[0].id);
+                    if (resultTree[0].children && resultTree[0].children.length > 0) {
+                        newExpandedKeys.add(resultTree[0].children[0].id);
                     }
+                    expandedKeys.value = newExpandedKeys;
+                } finally {
+                    isSearching.value = false;
                 }
-            }
-
-            expandedKeys.value = newExpandedKeys;
+            }, 300); // 300ms debounce
         }
 
         function clearSearch() {
+            if (searchTimer) clearTimeout(searchTimer);
             searchKeyword.value = '';
             matchedNodes.value = [];
+            expandedKeys.value = new Set();
+            isSearching.value = false;
+
+            // Restore root pagination state
+            treeData.splice(0, treeData.length);
+            rootLoadedCount.value = 0;
+            hasMoreRoot.value = true;
+            loadedCountMap.clear();
+            loadRootPage();
         }
 
         function isMatched(node: TreeNodeData): boolean {
-            if (!searchKeyword.value.trim()) return false;
+            if (!searchKeyword.value.trim() || matchedNodes.value.length === 0) return false;
             return matchedNodes.value.some((m) => m.id === node.id);
         }
 
@@ -294,6 +343,9 @@ export default defineComponent({
             expandedKeys,
             searchKeyword,
             matchedNodes,
+            isSearching,
+            selectionMode,
+            folderSelectable,
             onSearch,
             clearSearch,
             isMatched,
@@ -466,6 +518,43 @@ body {
 
 .demo-clear-selection-btn:hover {
     background: #4a5568;
+}
+
+.demo-controls {
+    display: flex;
+    gap: 20px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.demo-control-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #e2e8f0;
+    cursor: pointer;
+}
+
+.demo-control-label input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.demo-control-label select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+}
+
+.demo-control-label select option {
+    background: #2d3748;
+    color: #fff;
 }
 
 .demo-content {

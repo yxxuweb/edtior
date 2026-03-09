@@ -108,6 +108,11 @@ export default defineComponent({
         selectionMode: {
             type: String as PropType<'single' | 'multiple'>,
             default: 'single'
+        },
+        /** Whether non-leaf nodes can be selected */
+        folderSelectable: {
+            type: Boolean,
+            default: true
         }
     },
     emits: ['expand', 'collapse', 'node-click', 'select', 'update:selectedKeys'],
@@ -303,6 +308,10 @@ export default defineComponent({
 
         // ── Node select ────────────────────────────────────────
         function onSelect(node: TreeNodeData) {
+            if (!props.folderSelectable && !node.isLeaf) {
+                return; // Folders are not selectable
+            }
+
             const newSet = new Set(internalSelectedKeys.value);
             const isSelected = newSet.has(node.id);
 

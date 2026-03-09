@@ -1,9 +1,9 @@
-import { defineComponent as R, openBlock as u, createElementBlock as h, normalizeStyle as m, normalizeClass as T, createElementVNode as N, toDisplayString as M, createCommentVNode as z, Fragment as b, withModifiers as $, renderSlot as H, createTextVNode as B, ref as L, reactive as A, computed as p, watch as K, nextTick as D, resolveComponent as G, renderList as J, createBlock as P, withCtx as Q } from "vue";
+import { defineComponent as R, openBlock as u, createElementBlock as h, normalizeStyle as m, normalizeClass as T, createElementVNode as N, toDisplayString as C, createCommentVNode as z, Fragment as K, withModifiers as $, renderSlot as B, createTextVNode as H, ref as S, reactive as A, computed as k, watch as b, nextTick as D, resolveComponent as G, renderList as J, createBlock as P, withCtx as Q } from "vue";
 function U(e, o, s = !1) {
   const i = [];
   function a(v, f, d) {
     for (const l of v) {
-      const c = o.has(l.id), k = l.isLeaf === !0, C = !k && (l.children && l.children.length > 0 || l.hasMore === !0 || l.isLeaf === void 0);
+      const c = o.has(l.id), p = l.isLeaf === !0, L = !p && (l.children && l.children.length > 0 || l.hasMore === !0 || l.isLeaf === void 0);
       i.push({
         key: String(l.id),
         node: l,
@@ -11,9 +11,9 @@ function U(e, o, s = !1) {
         expanded: c,
         parentId: d,
         isLoadMore: !1,
-        hasChildren: C,
-        isLeaf: k
-      }), c && !k && (l.children && l.children.length > 0 && a(l.children, f + 1, l.id), l.hasMore && i.push({
+        hasChildren: L,
+        isLeaf: p
+      }), c && !p && (l.children && l.children.length > 0 && a(l.children, f + 1, l.id), l.hasMore && i.push({
         key: `__load_more_${l.id}`,
         node: l,
         level: f + 1,
@@ -107,8 +107,8 @@ function oe(e, o, s, i, a, v) {
     e.flatNode.isLoadMore ? (u(), h("div", X, [
       o[2] || (o[2] = N("span", { class: "vtree-spinner" }, null, -1)),
       o[3] || (o[3] = N("span", { class: "vtree-auto-load-text" }, "加载中...", -1)),
-      (f = e.flatNode.node) != null && f.totalChildren && ((l = (d = e.flatNode.node) == null ? void 0 : d.children) != null && l.length) ? (u(), h("span", Z, " (" + M(e.flatNode.node.children.length) + " / " + M(e.flatNode.node.totalChildren) + ") ", 1)) : z("", !0)
-    ])) : (u(), h(b, { key: 1 }, [
+      (f = e.flatNode.node) != null && f.totalChildren && ((l = (d = e.flatNode.node) == null ? void 0 : d.children) != null && l.length) ? (u(), h("span", Z, " (" + C(e.flatNode.node.children.length) + " / " + C(e.flatNode.node.totalChildren) + ") ", 1)) : z("", !0)
+    ])) : (u(), h(K, { key: 1 }, [
       N("span", {
         class: T(["vtree-expand-icon", {
           "vtree-expand-icon--expanded": e.flatNode.expanded,
@@ -116,7 +116,7 @@ function oe(e, o, s, i, a, v) {
         }]),
         onClick: o[0] || (o[0] = $((...c) => e.onToggle && e.onToggle(...c), ["stop"]))
       }, [
-        e.flatNode.hasChildren && !e.flatNode.isLeaf ? (u(), h(b, { key: 0 }, [
+        e.flatNode.hasChildren && !e.flatNode.isLeaf ? (u(), h(K, { key: 0 }, [
           e.nodeLoading ? (u(), h("span", x)) : (u(), h("svg", ee, [...o[4] || (o[4] = [
             N("path", {
               d: "M6 4l4 4-4 4",
@@ -133,10 +133,10 @@ function oe(e, o, s, i, a, v) {
         class: "vtree-node-label",
         onClick: o[1] || (o[1] = $((...c) => e.onLabelClick && e.onLabelClick(...c), ["stop"]))
       }, [
-        H(e.$slots, "default", {
+        B(e.$slots, "default", {
           node: e.flatNode.node
         }, () => [
-          B(M(e.flatNode.node.label), 1)
+          H(C(e.flatNode.node.label), 1)
         ])
       ])
     ], 64))
@@ -194,38 +194,43 @@ const ne = /* @__PURE__ */ E(W, [["render", oe]]), le = R({
     selectionMode: {
       type: String,
       default: "single"
+    },
+    /** Whether non-leaf nodes can be selected */
+    folderSelectable: {
+      type: Boolean,
+      default: !0
     }
   },
   emits: ["expand", "collapse", "node-click", "select", "update:selectedKeys"],
   setup(e, { emit: o }) {
-    const s = L(
+    const s = S(
       new Set(e.defaultExpandedKeys)
-    ), i = L(
+    ), i = S(
       new Set(e.selectedKeys)
-    ), a = A(/* @__PURE__ */ new Set()), v = L(null), f = L(0), d = p(
+    ), a = A(/* @__PURE__ */ new Set()), v = S(null), f = S(0), d = k(
       () => U(e.data, s.value, e.hasMoreRoot)
-    ), l = p(
+    ), l = k(
       () => d.value.length * e.itemHeight
-    ), c = p(() => {
+    ), c = k(() => {
       const t = Math.floor(f.value / e.itemHeight);
       return Math.max(0, t - e.overscan);
-    }), k = p(() => {
+    }), p = k(() => {
       const t = Math.ceil(e.height / e.itemHeight), n = Math.floor(f.value / e.itemHeight) + t + e.overscan;
       return Math.min(d.value.length, n);
-    }), C = p(
-      () => d.value.slice(c.value, k.value)
-    ), I = p(() => c.value * e.itemHeight);
+    }), L = k(
+      () => d.value.slice(c.value, p.value)
+    ), I = k(() => c.value * e.itemHeight);
     function V() {
       v.value && (f.value = v.value.scrollTop);
     }
     function _(t) {
       return t.isLoadMore ? t.node ? `__load_more_${t.node.id}` : "__load_more_root" : "";
     }
-    function S(t, n) {
+    function M(t, n) {
       for (const r of t) {
         if (r.id === n) return r;
         if (r.children) {
-          const g = S(r.children, n);
+          const g = M(r.children, n);
           if (g) return g;
         }
       }
@@ -240,7 +245,7 @@ const ne = /* @__PURE__ */ E(W, [["render", oe]]), le = R({
           return;
         a.add(r), a.add(g);
         try {
-          const y = await e.loadChildren(t), w = S(e.data, t.id);
+          const y = await e.loadChildren(t), w = M(e.data, t.id);
           w && (w.children = y.children, w.hasMore = y.hasMore);
         } finally {
           a.delete(r), D(() => {
@@ -255,7 +260,7 @@ const ne = /* @__PURE__ */ E(W, [["render", oe]]), le = R({
       if (!(a.has(n) || a.has(r))) {
         a.add(n);
         try {
-          const g = await e.loadChildren(t), y = S(e.data, t.id);
+          const g = await e.loadChildren(t), y = M(e.data, t.id);
           y && (y.children || (y.children = []), y.children.push(...g.children), y.hasMore = g.hasMore);
         } finally {
           a.delete(n);
@@ -274,8 +279,8 @@ const ne = /* @__PURE__ */ E(W, [["render", oe]]), le = R({
         }
       }
     }
-    K(
-      C,
+    b(
+      L,
       (t) => {
         for (const n of t)
           n.isLoadMore && (n.node ? O(n.node) : F());
@@ -286,15 +291,17 @@ const ne = /* @__PURE__ */ E(W, [["render", oe]]), le = R({
       o("node-click", t);
     }
     function q(t) {
+      if (!e.folderSelectable && !t.isLeaf)
+        return;
       const n = new Set(i.value), r = n.has(t.id);
       e.selectionMode === "single" ? (n.clear(), r || n.add(t.id)) : r ? n.delete(t.id) : n.add(t.id), i.value = n, o("select", t, n), o("update:selectedKeys", n);
     }
-    return K(
+    return b(
       () => e.selectedKeys,
       (t) => {
         t && (i.value = new Set(t));
       }
-    ), K(
+    ), b(
       () => e.defaultExpandedKeys,
       (t) => {
         t && (s.value = new Set(t));
@@ -303,7 +310,7 @@ const ne = /* @__PURE__ */ E(W, [["render", oe]]), le = R({
       scrollContainer: v,
       flatList: d,
       totalHeight: l,
-      visibleItems: C,
+      visibleItems: L,
       offsetY: I,
       loadingKeys: a,
       internalSelectedKeys: i,
@@ -331,7 +338,7 @@ function ae(e, o, s, i, a, v) {
       class: "vtree-visible-area",
       style: m({ transform: `translateY(${e.offsetY}px)` })
     }, [
-      (u(!0), h(b, null, J(e.visibleItems, (d) => {
+      (u(!0), h(K, null, J(e.visibleItems, (d) => {
         var l;
         return u(), P(f, {
           key: d.key,
@@ -346,8 +353,8 @@ function ae(e, o, s, i, a, v) {
           onSelect: e.onSelect
         }, {
           default: Q(({ node: c }) => [
-            H(e.$slots, "default", { node: c }, () => [
-              B(M(c.label), 1)
+            B(e.$slots, "default", { node: c }, () => [
+              H(C(c.label), 1)
             ])
           ]),
           _: 3

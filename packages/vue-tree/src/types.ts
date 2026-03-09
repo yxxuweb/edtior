@@ -76,6 +76,8 @@ export interface VirtualTreeProps {
   selectedKeys?: Set<string | number>;
   /** Selection mode: 'single' for single selection, 'multiple' for multiple selection */
   selectionMode?: "single" | "multiple";
+  /** Whether non-leaf (folder) nodes can be selected (default: true) */
+  folderSelectable?: boolean;
 }
 
 /**

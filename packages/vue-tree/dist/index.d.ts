@@ -170,6 +170,11 @@ selectionMode: {
 type: PropType<"single" | "multiple">;
 default: string;
 };
+/** Whether non-leaf nodes can be selected */
+folderSelectable: {
+type: BooleanConstructor;
+default: boolean;
+};
 }>, {
 scrollContainer: Ref<HTMLDivElement | null, HTMLDivElement | null>;
 flatList: ComputedRef<FlatNode[]>;
@@ -236,6 +241,11 @@ selectionMode: {
 type: PropType<"single" | "multiple">;
 default: string;
 };
+/** Whether non-leaf nodes can be selected */
+folderSelectable: {
+type: BooleanConstructor;
+default: boolean;
+};
 }>> & Readonly<{
 "onNode-click"?: ((...args: any[]) => any) | undefined;
 onSelect?: ((...args: any[]) => any) | undefined;
@@ -256,6 +266,7 @@ hasMoreRoot: boolean;
 overscan: number;
 selectedKeys: Set<string | number>;
 selectionMode: "single" | "multiple";
+folderSelectable: boolean;
 }, {}, {
 TreeNodeRow: DefineComponent<ExtractPropTypes<    {
 flatNode: {
@@ -363,6 +374,8 @@ export declare interface VirtualTreeProps {
     selectedKeys?: Set<string | number>;
     /** Selection mode: 'single' for single selection, 'multiple' for multiple selection */
     selectionMode?: "single" | "multiple";
+    /** Whether non-leaf (folder) nodes can be selected (default: true) */
+    folderSelectable?: boolean;
 }
 
 export { }
